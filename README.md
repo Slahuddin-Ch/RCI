@@ -1,4 +1,26 @@
 # RCI
+## Environment Setup
+
+1. **Create Virtual Environment**
+```bash
+# Create venv
+python -m venv .venv
+
+# Activate venv
+# Windows
+.venv\Scripts\activate
+# Linux/Mac
+source .venv/bin/activate
+```
+
+2. **Install Dependencies**
+```bash
+# Install from requirements.txt
+pip install -r requirements.txt
+```
+
+**Note:** GDAL may require additional system-level installations depending on your OS.
+
 
 ## Key Features
 
