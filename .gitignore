@@ -1,0 +1,4 @@
+.venv/
+dataset/
+tiles_with_metadata/
+jpg_output/
