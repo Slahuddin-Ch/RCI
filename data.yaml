@@ -1,5 +1,5 @@
 # data.yaml
-path: /home/user/Documents/LRS/mask
+path: /home/user/Documents/LRS/mask-semantic
 train: train/images
 val: valid/images
 test: test/images

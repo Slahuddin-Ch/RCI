@@ -135,8 +135,8 @@ YOLOv8 is integrated for automated road detection and segmentation, providing st
     train: train/images
     val: valid/images
     test: test/images
-    nc: 1  # Number of classes
-    names: ['road']  # Class names
+    nc: 2  # Number of classes
+    names: ['road', 'background']  # Class names
     ```
   - Hyperparameter optimization for road detection
   - Multi-scale training support
