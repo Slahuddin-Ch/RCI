@@ -2,5 +2,11 @@
 dataset/
 tiles_with_metadata/
 jpg_output/
-RSI_test.ipynb/
 jpg_output_dataset/
+YOLO/
+runs/
+jpg_dataset/
+road_lableing.coco-segmentation/
+tiles_with_metadata_20241014aC0823645w280045n/
+jpg_output_dataset_20241014aC0823645w280045n/
+RCI_test.ipynb
