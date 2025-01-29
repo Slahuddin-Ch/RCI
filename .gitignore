@@ -5,5 +5,5 @@ label-data/
 Models/
 tiles_with_metadata/
 mask-semantic/
-yolo8n-seg.pt
-yolo11n_best.pt
+*.pt
+tiles/

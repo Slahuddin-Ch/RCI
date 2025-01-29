@@ -1,5 +1,5 @@
 # data.yaml
-path: /home/user/Documents/LRS/mask-semantic
+path: /home/user/Desktop/rci/Road_mask/processed_data
 train: train/images
 val: valid/images
 test: test/images
