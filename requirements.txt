@@ -1,0 +1,50 @@
+# Core Data Processing
+numpy
+pandas
+scipy
+scikit-learn
+scikit-image
+
+# Deep Learning
+torch
+torchvision
+segmentation-models-pytorch
+albumentations
+timm
+
+# Image Processing
+opencv-python
+Pillow
+rasterio
+GDAL==3.4.1
+shapefile
+
+# Geospatial Processing
+geopandas
+shapely
+pyproj
+fiona
+
+# Visualization
+matplotlib
+seaborn
+plotly
+
+# Utility
+tqdm
+pyyaml
+joblib
+
+# Model Tracking and Experiment Management
+wandb
+tensorboard
+
+# Quality and Testing
+pytest
+black
+flake8
+
+# Optional but recommended for Jupyter development
+jupyter
+ipywidgets
+ultralytics

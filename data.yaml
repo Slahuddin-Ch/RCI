@@ -1,0 +1,8 @@
+# data.yaml
+path: /home/user/Documents/LRS/mask
+train: train/images
+val: valid/images
+test: test/images
+
+nc: 2  # Number of classes
+names: ['road','background']  # Class names (update if you have multiple classes)
