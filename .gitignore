@@ -1,4 +1,5 @@
 .venv/
+.venv_rci/
 data/
 dataset/
 label-data/
@@ -7,3 +8,11 @@ tiles_with_metadata/
 mask-semantic/
 *.pt
 tiles/
+RCI_test.ipynb
+debris/
+*.csv
+*.pdf
+LRS.ipynb
+LRS_til.ipynb
+road_widths.json
+result_image.png

@@ -1,18 +1,32 @@
 # Road Condition Inspector (RCI)
 
-A comprehensive tool for analyzing road conditions using satellite imagery and machine learning.
+A comprehensive tool for analyzing road conditions using satellite imagery and machine learning. RCI transforms satellite imagery into actionable metrics through a fusion of geospatial analysis, computer vision, and statistical methods.
 
-## Table of Contents
-- [Environment Setup](#environment-setup)
-- [Project Components](#project-components)
-  - [Image Processing](#image-processing)
-  - [Tiling System](#tiling-system)
-  - [Linear Reference System (LRS)](#linear-reference-system-lrs)
-  - [YOLO Implementation](#yolo-implementation)
-- [Technical Details](#technical-details)
-  - [GSD (Ground Sample Distance)](#gsd-ground-sample-distance)
-  - [GIS File Formats](#gis-file-formats)
-- [Usage](#usage)
+## Features
+
+- **Image Processing**
+  - Support for GeoTIFF files with geographic coordinate systems
+  - Automatic coordinate extraction and transformation
+  - Batch processing capabilities for large datasets
+  - Ground Sample Distance (GSD) calculation for accurate measurements
+
+- **Tiling System**
+  - Splits large satellite images (4707×4707 pixels) into manageable 640×640 tiles
+  - Preserves geographic metadata for each tile
+  - Non-overlapping tile generation for efficient processing
+  - Grid visualization for tile boundaries
+
+- **Linear Reference System (LRS)**
+  - Principal Component Analysis (PCA) for road dimension estimation
+  - Accurate road width and length measurements
+  - Lane estimation based on standard width (3.6m)
+  - Integration with existing transportation networks
+
+- **YOLO Implementation**
+  - YOLOv8 integration for road detection and segmentation
+  - Custom dataset preparation and training pipeline
+  - Support for both detection and segmentation modes
+  - Real-time inference capabilities
 
 ## Environment Setup
 
@@ -30,135 +44,62 @@ source .venv/bin/activate
 
 2. **Install Dependencies**
 ```bash
-# Install from requirements.txt
 pip install -r requirements.txt
 ```
 
-**Note:** GDAL may require additional system-level installations depending on your OS.
+Note: GDAL may require additional system-level installations depending on your OS.
 
-## Project Components
+## Technical Components
 
-### Image Processing
-- Supports GeoTIFF files (Geographic Tagged Image File Format)
-- GSD (Ground Sample Distance): Represents the physical size (typically in meters) that each pixel covers on the ground
-- Batch processing capabilities for large datasets
-- Automatic coordinate extraction and center point calculation
+### Coordinate Transformations
+- Pixel to geographic coordinate conversion
+- Support for various map projections
+- Geotransformation matrix handling
+- Ground control point integration
 
-### Tiling System
-- Splits large satellite images into 640x640 pixel tiles
-- Preserves geographic metadata for each tile
-- Grid visualization for tile boundaries
-- Template matching for tile position validation
+### Road Analysis
+- Width calculation using PCA
+- Lane estimation algorithms
+- Statistical analysis of road segments
+- Integration with LRS networks
 
-### Linear Reference System (LRS)
-The LRS component provides sophisticated road analysis capabilities through computer vision and geospatial techniques:
+### Dataset Organization
+```
+dataset/
+├── train/
+│   ├── images/
+│   └── labels/
+├── valid/
+│   ├── images/
+│   └── labels/
+└── test/
+    ├── images/
+    └── labels/
+```
 
-#### Technical Components
-- **Principal Component Analysis (PCA)**
-  - Estimates road dimensions by finding major/minor axes
-  - Projects contour points onto principal axes for accurate measurements
-  - Calculates road orientation and direction
+## Key Formulas
 
-- **Ground Sampling Distance (GSD)**
-  - Converts pixel measurements to real-world distances
-  - Accounts for Earth's curvature in longitude calculations
-  - Uses geographic metadata for precise measurements
-  ```python
-  meters_per_degree_lat = 111319.9
-  meters_per_degree_lon = meters_per_degree_lat * cos(latitude)
-  gsd_x = pixel_scale_x * meters_per_degree_lon
-  gsd_y = pixel_scale_y * meters_per_degree_lat
-  ```
+- Pixel to Longitude: `lon = GT₀ + (x + 0.5) · GT₁`
+- Pixel to Latitude: `lat = GT₃ + (y + 0.5) · GT₅`
+- GSD (Longitudinal): `GSD_x = GT₁ · 111319.9 · cos(lat)`
+- Road Width: `Width_meters = span_minor_axis · GSD_x`
+- Lane Estimation: `Lanes = round(Mean Width/3.6)`
 
-- **Contour Detection**
-  - Uses OpenCV's findContours with RETR_EXTERNAL mode
-  - Filters noise by excluding small contours (area < 500 pixels)
-  - Identifies continuous road segments
+## Validation & Calibration
 
-#### Analysis Features
-- **Road Dimension Analysis**
-  - Width and length measurements in meters
-  - Lane estimation based on standard lane width (3.6m)
-  - Area calculations for road segments
-  - Automated road width assessment
+- Coordinate accuracy requirement: ≤5 meters error vs. ground control points
+- Width calibration: Apply correction factor if model vs. ground truth discrepancy >15%
+- Performance evaluation using IoU (Intersection over Union)
+- Dataset split: 80% training, 10% validation, 10% test
 
-- **Statistical Analysis**
-  - Mean width calculation with standard deviation
-  - Min/max width detection
-  - Total length and area computations
-  - Per-segment metrics and aggregated statistics
+## Usage
 
-- **Coordinate Integration**
-  - Pixel-to-meter conversion using GSD
-  - Geographic coordinate system support
-  - Location-aware measurements
+The project includes three main Jupyter notebooks:
+- `RCI.ipynb`: Core image processing and tiling functionality
+- `LRS.ipynb`: Linear Reference System implementation
+- `yolo.ipynb`: YOLO training and inference examples
 
-### YOLO Implementation
-YOLOv8 is integrated for automated road detection and segmentation, providing state-of-the-art deep learning capabilities:
 
-#### Mask Processing System
-- **Format Conversion Pipeline**
-  ```python
-  # Example annotation format for segmentation
-  class_id x1 y1 x2 y2 x3 y3 ...  # Polygon points
-  0 0.5 0.5 0.6 0.6 0.7 0.5 ...   # Normalized coordinates
-  ```
-  - Converts binary masks to YOLO-compatible formats
-  - Supports both detection (bounding boxes) and segmentation modes
-  - Automated contour extraction and normalization
-  - Preserves spatial relationships in annotations
-
-#### Dataset Organization
-- **Directory Structure**
-  ```
-  dataset/
-  ├── train/
-  │   ├── images/
-  │   └── labels/
-  ├── valid/
-  │   ├── images/
-  │   └── labels/
-  └── test/
-      ├── images/
-      └── labels/
-  ```
-  - Automatic split into train/valid/test sets
-  - Maintains paired image-label relationships
-  - Supports both jpg/png image formats
-
-#### Training Configuration
-- **YOLOv8 Integration**
-  - Uses pre-trained YOLOv8 segmentation models
-  - Custom configuration via data.yaml:
-    ```yaml
-    path: /path/to/dataset
-    train: train/images
-    val: valid/images
-    test: test/images
-    nc: 2  # Number of classes
-    names: ['road', 'background']  # Class names
-    ```
-  - Hyperparameter optimization for road detection
-  - Multi-scale training support
-
-#### Model Capabilities
-- **Segmentation Features**
-  - Instance-level road segmentation
-  - Real-time processing capabilities
-  - Confidence thresholding for precision control
-  - Post-processing for enhanced boundary detection
-
-- **Deployment Options**
-  - Batch processing for large datasets
-  - Real-time inference support
-  - Export to various formats (ONNX, TensorRT)
-  - GPU acceleration support
-
-#### Visualization and Analysis
-- Built-in visualization tools
-- Performance metrics tracking
-- Confusion matrix analysis
-- Integration with plotting libraries
 
 ## Technical Details
 
@@ -183,45 +124,11 @@ Ground Sample Distance in remote sensing and aerial imagery:
 - Mission planning
 - Map scale determination
 
-### GIS File Formats
+## File Format Support
 
-**TIFF (Tagged Image File Format):**
-- Geographic coordinate systems
-- Map projections
-- Ground control points
-- Pixel resolution data
-- Spatial reference info
-
-**.shp (Shapefile)**
-- Main file containing geographic features and geometry
-- Stores points, lines, polygons representing map features
-
-**.shx (Shape Index)**
-- Index file enabling quick searching of shapes
-- Contains position index of geographic features
-
-**.dbf (Database File)**
-- Attribute database storing feature properties
-- Contains tabular data linked to geometric features
-- Readable by spreadsheet software
-
-**.prj (Projection)**
-- Text file defining coordinate system
-- Contains spatial reference information
-- Specifies map projection parameters
-
-**.tar (Tape Archive)**
-- Container file that bundles multiple files
-- Used to package and compress GIS datasets
-- Common for distributing complete datasets with all components
-
-*Note: .shp, .shx, .dbf, and .prj typically work together as a set and are required for full shapefile functionality.*
-
-## Usage
-
-Detailed usage instructions and examples can be found in the included Jupyter notebooks:
-- `RCI.ipynb`: Main image processing and tiling functionality
-- `LRS.ipynb`: Linear Reference System implementation
-- `yolo.ipynb`: YOLO training and inference
+- **TIFF/GeoTIFF**: Geographic coordinate systems, map projections
+- **Shapefile (.shp)**: Geographic features and geometry
+- **Database File (.dbf)**: Attribute storage
+- **Projection File (.prj)**: Coordinate system definitions
 
 For implementation details and methodology, refer to the individual notebook documentation.

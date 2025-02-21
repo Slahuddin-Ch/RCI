@@ -17,7 +17,7 @@ opencv-python
 Pillow
 rasterio
 GDAL==3.4.1
-shapefile
+pyshp
 
 # Geospatial Processing
 geopandas
@@ -48,3 +48,4 @@ flake8
 jupyter
 ipywidgets
 ultralytics
+tensorflow
